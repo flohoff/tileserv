@@ -1,0 +1,49 @@
+#!/bin/bash
+
+DATADIR="/current/$1"
+
+SU="sudo -u renderer"
+PSQL="${SU} psql gis "
+
+
+boundary_import() {
+	BOUNDARYGZ=$(ls -1 ${DATADIR}/*.geojson.gz)
+	zcat ${BOUNDARYGZ} >/tmp/boundary.geojson
+
+	${SU} ogr2ogr -f "PostgreSQL" PG:"dbname=gis" \
+		"/tmp/boundary.geojson" \
+		-nln boundaries -overwrite \
+		-t_srs "EPSG:3857"
+}
+
+gdal_update() {
+
+	dpkg --compare-versions $(dpkg-query -f '${Version}' -W gdal-bin) gt 3
+	if [ $? -eq 0 ]; then
+		return
+	fi
+
+	# Bionic gdal 2.2.3 is broken using Postgres 12
+	# so we need temporarily for the import of the geojson
+	# a gdal 3.0.2+ - Install from ubuntugis-unstable
+
+	apt-get update
+	apt-get -fuy install software-properties-common
+	add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+	apt-get update
+	apt-get -fuy install gdal-bin
+}
+
+set -x
+
+gdal_update
+boundary_import
+
+${PSQL} --echo-all -f "/current/processboundary.sql"
+
+sync
+sleep 1
+/etc/init.d/postgresql stop
+sync
+sleep 1
+sync

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+BASE=$(readlink -f $(dirname $0))
+NAME=$1
+DATADIR=${BASE}/${NAME}
+
+
+if [ -z "${NAME}" -o ! -d "${DATADIR}" ]; then
+	echo No project name or directory
+	exit 0
+fi
+
+PBF=$(ls -1 ${DATADIR}/*.pbf)
+
+if [ -z "${PBF}" ]; then
+	echo Datadir does not contain a pbf file
+	exit 0
+fi
+
+
+docker volume create osmdb-${NAME}
+
+time docker run \
+	--rm \
+        --name dataprepare-${NAME} \
+        -v ${PBF}:/data.osm.pbf \
+        -v osmdb-${NAME}:/var/lib/postgresql/12/main \
+        overv/openstreetmap-tile-server:1.3.10 \
+        import
+
+docker run \
+        --name dataprepare-${NAME} \
+        --rm \
+        -d \
+        -v osmdb-${NAME}:/var/lib/postgresql/12/main \
+	-v ${BASE}:/current \
+        overv/openstreetmap-tile-server:1.3.10 \
+        run
+
+docker exec \
+	dataprepare-${NAME} \
+	/current/withindocker-cutosmdata ${NAME}
+
+docker stop dataprepare-${NAME}
+
