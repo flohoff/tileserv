@@ -20,53 +20,52 @@ insert into coverups ( name, geom ) (
 	from	boundaries
 );
 
+-- Instead of deleting data just coverup 2000km
 insert into coverups ( name, geom ) (
-       	select	'c4', ST_Buffer(wkb_geometry, 5000)
+       	select	'c4', ST_Buffer(wkb_geometry, 2000000)
 	from	boundaries
 );
 
--- Delete all objects completely outside of the coverup 3 which is 90% opacity
-
-delete from planet_osm_line where
-	not ST_Intersects((select geom from coverups where name = 'c3'),way);
-
-delete from planet_osm_polygon where
-	not ST_Intersects((select geom from coverups where name = 'c3'),way);
-
-delete from planet_osm_point where
-	not ST_Intersects((select geom from coverups where name = 'c3'),way);
-
-delete from planet_osm_roads where
-	not ST_Intersects((select geom from coverups where name = 'c3'),way);
-
-
-
--- We are planning to cut/split lines. So lines will become MultiLineString
--- from LineString. Normal osm2pgsql schema does not allow this to alter
--- table to be able to hold MultiLineStrings
-alter table planet_osm_line alter COLUMN way type geometry(Geometry,3857);
-alter table planet_osm_roads alter COLUMN way type geometry(Geometry,3857);
-
--- Cut off everything overlapping the c3 our c3
-
-update  planet_osm_line set way = ST_Intersection(c.geom, way)
-from    coverups c 
-where   ST_Crosses(c.geom, way)
-and	c.name = 'c3';
-
-update  planet_osm_roads set way = ST_Intersection(c.geom, way)
-from    coverups c 
-where   ST_Crosses(c.geom, way)
-and	c.name = 'c3';
-
-update  planet_osm_polygon set way = ST_Intersection(c.geom, way)
-from    coverups c 
-where   ST_Overlaps(c.geom, way)
-and	c.name = 'c3';
-
-
-
-
+-- 
+-- -- Delete all objects completely outside of the coverup 3 which is 90% opacity
+-- 
+-- delete from planet_osm_line where
+-- 	not ST_Intersects((select geom from coverups where name = 'c3'),way);
+-- 
+-- delete from planet_osm_polygon where
+-- 	not ST_Intersects((select geom from coverups where name = 'c3'),way);
+-- 
+-- delete from planet_osm_point where
+-- 	not ST_Intersects((select geom from coverups where name = 'c3'),way);
+-- 
+-- delete from planet_osm_roads where
+-- 	not ST_Intersects((select geom from coverups where name = 'c3'),way);
+-- 
+-- 
+-- 
+-- -- We are planning to cut/split lines. So lines will become MultiLineString
+-- -- from LineString. Normal osm2pgsql schema does not allow this to alter
+-- -- table to be able to hold MultiLineStrings
+-- alter table planet_osm_line alter COLUMN way type geometry(Geometry,3857);
+-- alter table planet_osm_roads alter COLUMN way type geometry(Geometry,3857);
+-- 
+-- -- Cut off everything overlapping the c3 our c3
+-- 
+-- update  planet_osm_line set way = ST_Intersection(c.geom, way)
+-- from    coverups c 
+-- where   ST_Crosses(c.geom, way)
+-- and	c.name = 'c3';
+-- 
+-- update  planet_osm_roads set way = ST_Intersection(c.geom, way)
+-- from    coverups c 
+-- where   ST_Crosses(c.geom, way)
+-- and	c.name = 'c3';
+-- 
+-- update  planet_osm_polygon set way = ST_Intersection(c.geom, way)
+-- from    coverups c 
+-- where   ST_Overlaps(c.geom, way)
+-- and	c.name = 'c3';
+ 
 
 -- Inner coverup
 insert into planet_osm_polygon ( osm_id, landuse, way_area, way ) (
