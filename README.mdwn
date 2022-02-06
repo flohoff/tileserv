@@ -1,0 +1,38 @@
+
+Hier die modifizierten Container/Setup scripte um die Karte aus der Umgebung
+sauber auszuschneiden.
+
+Es wird erst das original OSM .pbf file importiert. Dann wird in
+dem container ein neueres gdal-bin installiert (Für den import des
+geojsons der Grenze in die Postgres) und anschliessend wird die Grenze
+in die tabelle "boundaries" importiert.
+
+Anschliessend wird "processboundary.sql" ausgeführt das:
+
+- coverup buffer zones um die boundary erzeugt für die "Ausblendringe"
+  in der tabelle coverup.
+- Alle nodes, lines, polygons die vollständig ausserhalb der Grenze sind
+  löscht
+- Das Schema der Datenbank ändert das auch GeometryCollections in den
+  polygon und lines tabellen stehen dürfen.
+- Alle lines und polygons an der Grenze hart abschneidet.
+- Die coverup geometrieen entsprechend ausschneiden und in die landuse tabelle
+  einfügen
+
+mapnik.xml
+==========
+
+Die mapnik.xml ist die originale aus dem openstreetmap-carto und zusätzlich einiger
+transparent polygon layer für die coverup landuses. (Am Ende um alles zu überdecken)
+
+
+Deutschland
+===========
+
+	https://download.geofabrik.de/europe/germany-latest.osm.pbf
+
+Importing times Ryzen 16 Core, 64GByte, SSD
+
+	Osm2pgsql		330 Minuten
+	Deleting objects: 	210 Minuten
+	
