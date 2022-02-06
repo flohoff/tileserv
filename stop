@@ -1,2 +1,2 @@
-docker stop renderd-kreisgt
-docker rm renderd-kreisgt
+docker stop renderd-$1
+docker rm renderd-$1
