@@ -1,8 +1,16 @@
+#!/bin/bash
 
+BASE=$(readlink -f $(dirname $0))
+CPUS=$(grep ^processor /proc/cpuinfo  | wc -l)
+TILEDIR="${BASE}/tiles-$1"
+
+[ -e ${TILEDIR} ] || mkdir ${TILEDIR}
 
 docker run -p 8080:80 \
 	--name renderd-$1 \
+	-e THREADS=${CPUS} \
 	--shm-size=512M \
+	-v ${TILEDIR}:/var/lib/mod_tile/ \
         -v osmdb-$1:/var/lib/postgresql/12/main \
 	-v $PWD/mapnik.xml:/home/renderer/src/openstreetmap-carto/mapnik.xml \
         -d overv/openstreetmap-tile-server:1.3.10 run
