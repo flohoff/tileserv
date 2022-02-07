@@ -25,6 +25,28 @@ mapnik.xml
 Die mapnik.xml ist die originale aus dem openstreetmap-carto und zusätzlich einiger
 transparent polygon layer für die coverup landuses. (Am Ende um alles zu überdecken)
 
+Extent der Karte
+================
+
+gis=> select ST_Extent(ST_Transform(wkb_geometry,4632)) from boundaries;
+                                st_extent                                 
+--------------------------------------------------------------------------
+ BOX(5.86659547160193 47.2699768365961,15.0413268108882 55.0984313956076)
+
+
+Tile uris for prefetching
+=========================
+
+z12 für den Deutschland extent von oben:
+
+	gentileuris  -u http://a.tile.zz.de/tile -l 5.86 -r 15.04 -t 55.09 -b 47.26 -z 12
+
+Prefetching tiles:
+
+	gentileuris  -u http://a.tile.zz.de/tile \
+		-l 5.86 -r 15.04 -t 55.09 -b 47.26 -z 12 \
+		| shuf \
+		| xargs -P8 -n1 wget -nv 
 
 Deutschland
 ===========
@@ -36,3 +58,7 @@ Importing times Ryzen 16 Core, 64GByte, SSD
 	Osm2pgsql		330 Minuten
 	Deleting objects: 	210 Minuten
 	
+
+
+
+

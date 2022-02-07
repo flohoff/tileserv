@@ -17,25 +17,28 @@ sub getTileNumber {
 
 my ($opt, $usage) = describe_options(
         "$Script %o <some-arg>",
-        [ 'zoom|z=s',		"Zoom level" ],
-        [ 'uribase|u=s',	"Zoom level" ],
-        [ 'left|l',		"Left longitude" ],
-        [ 'right|r',		"Right longitude" ],
-        [ 'top|t',		"Top latitude" ],
-        [ 'bottom|b',		"Bottom latitude" ],
+        [ 'zoom|z=s',		"Zoom level", { required => 1 } ],
+        [ 'uribase|u=s',	"Zoom level", { required => 1 } ],
+        [ 'left|l=s',		"Left longitude", { required => 1 } ],
+        [ 'right|r=s',		"Right longitude", { required => 1 } ],
+        [ 'top|t=s',		"Top latitude", { required => 1 } ],
+        [ 'bottom|b=s',		"Bottom latitude", { required => 1 } ],
         [],
         [ 'help',               "print usage message and exit", { shortcircuit => 1 } ],
 );
 
 print($usage->text), exit if $opt->help;
 
-my ($left, $bottom)=getTileNumber($opt->bottom, $opt->left, $opt->zoom);
-my ($right, $top)=getTileNumber($opt->top, $opt->right, $opt->zoom);
+my ($left, $bottom)=getTileNumber($opt->bottom*1, $opt->left*1, $opt->zoom);
+my ($right, $top)=getTileNumber($opt->top*1, $opt->right*1, $opt->zoom);
+
+printf(STDERR "Left: $left Right: $right\n");
+printf(STDERR "Top: $top Bottom: $bottom\n");
 
 # http://a.tile.zz.de/tile/12/2145/1353.png
 for(my $x=$left;$x<=$right;$x++) {
 	for(my $y=$top;$y<=$bottom;$y++) {
-		printf("%s/tile/%s/%s/%s.png\n",
+		printf("%s/%s/%s/%s.png\n",
 			$opt->uribase,
 			$opt->zoom, $x, $y);
 	}
