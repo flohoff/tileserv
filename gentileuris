@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+
+use strict;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+use FindBin qw($Bin $RealBin $Script);
+use Getopt::Long::Descriptive;
+use Math::Trig;
+
+sub getTileNumber {
+    my ($lat,$lon,$zoom) = @_;
+    my $xtile = int( ($lon+180)/360 * 2**$zoom ) ;
+    my $ytile = int( (1 - log(tan(deg2rad($lat)) + sec(deg2rad($lat)))/pi)/2 * 2**$zoom ) ;
+    return ($xtile, $ytile);
+}
+
+
+my ($opt, $usage) = describe_options(
+        "$Script %o <some-arg>",
+        [ 'zoom|z=s',		"Zoom level" ],
+        [ 'uribase|u=s',	"Zoom level" ],
+        [ 'left|l',		"Left longitude" ],
+        [ 'right|r',		"Right longitude" ],
+        [ 'top|t',		"Top latitude" ],
+        [ 'bottom|b',		"Bottom latitude" ],
+        [],
+        [ 'help',               "print usage message and exit", { shortcircuit => 1 } ],
+);
+
+print($usage->text), exit if $opt->help;
+
+my ($left, $bottom)=getTileNumber($opt->bottom, $opt->left, $opt->zoom);
+my ($right, $top)=getTileNumber($opt->top, $opt->right, $opt->zoom);
+
+# http://a.tile.zz.de/tile/12/2145/1353.png
+for(my $x=$left;$x<=$right;$x++) {
+	for(my $y=$top;$y<=$bottom;$y++) {
+		printf("%s/tile/%s/%s/%s.png\n",
+			$opt->uribase,
+			$opt->zoom, $x, $y);
+	}
+}
+
+
