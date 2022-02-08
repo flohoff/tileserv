@@ -116,3 +116,26 @@ insert into planet_osm_polygon ( osm_id, landuse, way_area, way ) (
 	) coverup2
 );
 
+
+
+--
+-- Generate ocean polygons from intersection between coverup 3
+-- and water_polygons
+--
+insert into planet_osm_polygon ( osm_id, landuse, way_area, way ) (
+	select	-1, 'ocean', ST_Area(way), way
+	from	(
+		select	ST_Subdivide(
+				ST_Intersection(boundary, waterpoly),
+			50) way
+		from	(
+			select	wp.wkb_geometry waterpoly, 
+				c.geom boundary
+			from	water_polygons wp,
+				coverups c 
+			where	c.name = 'c3'
+			and	ST_Intersects(c.geom, wp.wkb_geometry)
+			) intersections
+		) ways
+);
+

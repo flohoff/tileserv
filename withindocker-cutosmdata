@@ -16,6 +16,18 @@ boundary_import() {
 		-t_srs "EPSG:3857"
 }
 
+simplified_water_import() {
+	#/home/renderer/src/openstreetmap-carto/data/simplified-water-polygons-split-3857/simplified_water_polygons.shp
+	#/home/renderer/src/openstreetmap-carto/data/water-polygons-split-3857/water_polygons.shp
+	#/home/renderer/src/openstreetmap-carto/data/antarctica-icesheet-outlines-3857/icesheet_outlines.shp
+	#/home/renderer/src/openstreetmap-carto/data/ne_110m_admin_0_boundary_lines_land/ne_110m_admin_0_boundary_lines_land.shp
+	#/home/renderer/src/openstreetmap-carto/data/antarctica-icesheet-polygons-3857/icesheet_polygons.shp
+
+	${SU} ogr2ogr -f "PostgreSQL" PG:"dbname=gis" \
+		-nln water_polygons -overwrite -t_srs "EPSG:3857" \
+		/home/renderer/src/openstreetmap-carto/data/water-polygons-split-3857/water_polygons.shp
+}
+
 gdal_update() {
 
 	dpkg --compare-versions $(dpkg-query -f '${Version}' -W gdal-bin) gt 3
@@ -38,6 +50,7 @@ set -x
 
 gdal_update
 boundary_import
+simplified_water_import
 
 ${PSQL} --echo-all -f "/current/processboundary.sql"
 
