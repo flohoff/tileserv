@@ -20,9 +20,9 @@ insert into coverups ( name, geom ) (
 	from	boundaries
 );
 
--- Instead of deleting data just coverup 2000km
+-- Instead of deleting data just coverup 20km
 insert into coverups ( name, geom ) (
-       	select	'c4', ST_Buffer(wkb_geometry, 2000000)
+       	select	'c4', ST_Buffer(wkb_geometry, 20000)
 	from	boundaries
 );
 
