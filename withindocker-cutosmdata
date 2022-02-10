@@ -53,6 +53,7 @@ boundary_import
 simplified_water_import
 
 ${PSQL} --echo-all -f "/current/processboundary.sql"
+${PSQL} --echo-all -f "/current/droptables.sql"
 
 sync
 sleep 1
