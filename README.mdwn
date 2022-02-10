@@ -33,6 +33,12 @@ gis=> select ST_Extent(ST_Transform(wkb_geometry,4632)) from boundaries;
 --------------------------------------------------------------------------
  BOX(5.86659547160193 47.2699768365961,15.0413268108882 55.0984313956076)
 
+osm=# select osm_id, name, local_name, Box2D(wkb_geometry) from boundaries;
+ osm_id |     name     |  local_name   |                     box2d                      
+--------+--------------+---------------+------------------------------------------------
+ -62771 | Lower Saxony | Niedersachsen | BOX(6.3459138 51.2950751,11.598118 54.1387271)
+
+
 
 Tile uris for prefetching
 =========================
