@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html style="height:100%;margin:0;padding:0;">
+<title>Leaflet page with OSM render server selection</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="leaflet/leaflet.css" />
+<script src="leaflet/leaflet.js"></script>
+<script src="leaflet-hash.js"></script>
+<style type="text/css">
+.leaflet-tile-container { pointer-events: auto; }
+</style>
+</head>
+<body style="height:100%;margin:0;padding:0;">
+<div id="map" style="height:100%"></div>
+<script>
+//<![CDATA[
+var map = L.map('map', {
+	maxZoom: 20
+}).setView([51.8, 8.3], 12);
+
+L.tileLayer('http://{s}.tile.zz.de/expiretile/{z}/{x}/{y}.png', {
+	maxZoom: 20,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var hash = L.hash(map)
+//]]>
+</script>
+</body>
+</html>
