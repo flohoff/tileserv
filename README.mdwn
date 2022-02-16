@@ -11,19 +11,20 @@ Anschliessend wird "processboundary.sql" ausgeführt das:
 
 - coverup buffer zones um die boundary erzeugt für die "Ausblendringe"
   in der tabelle coverup.
-- Alle nodes, lines, polygons die vollständig ausserhalb der Grenze sind
-  löscht
-- Das Schema der Datenbank ändert das auch GeometryCollections in den
-  polygon und lines tabellen stehen dürfen.
-- Alle lines und polygons an der Grenze hart abschneidet.
 - Die coverup geometrieen entsprechend ausschneiden und in die landuse tabelle
   einfügen
+- Die water polygone aus dem shape innerhalb der coverup polygone ausschneider,
+  zerlegt und in die landuse tabelle einfügt.
+
 
 mapnik.xml
 ==========
 
 Die mapnik.xml ist die originale aus dem openstreetmap-carto und zusätzlich einiger
 transparent polygon layer für die coverup landuses. (Am Ende um alles zu überdecken)
+
+Ausserdem sind die water polygone entfernt. Werden in dem prepare in die postgres
+importiert und dann für die Grenzen zerschnitten und in die landuse tabelle eingefügt.
 
 Extent der Karte
 ================
